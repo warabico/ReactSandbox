@@ -1,6 +1,6 @@
 import * as React from "react";
 
-const STORAGE_KEY = "local-storage-lab-data-2";
+const STORAGE_KEY = "local-storage-lab-data";
 
 const Lab = () => {
     let restoredLabData = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [
