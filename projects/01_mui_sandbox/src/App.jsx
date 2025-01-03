@@ -1,17 +1,12 @@
 import React, { Suspense, useState, useEffect, lazy } from "react";
-import BaseErrorBoundary from "./BaseErrorBoundary";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import MenuIcon from "@mui/icons-material/Menu";
-import {
-    AppBar,
-    Toolbar,
-    Typography,
-    IconButton,
-    Menu,
-    MenuItem,
-    Container,
-} from "@mui/material";
+import { Container } from "@mui/material";
+
+import BaseErrorBoundary from "./BaseErrorBoundary";
+import AppNavbar from "./components/AppNavbar";
+
+const STORAGE_KEY = "rcg-current-lab-index";
 
 const theme = createTheme({
     palette: {
@@ -19,10 +14,8 @@ const theme = createTheme({
     },
 });
 
-const STORAGE_KEY = "rcg-current-lab-index";
-
 const DynamicLoader = ({ labId }) => {
-    const LazyComponent = lazy(() => import(`./${labId}/Lab`));
+    const LazyComponent = lazy(() => import(`./labs/${labId}/Lab`));
     return (
         <BaseErrorBoundary>
             <Suspense fallback={<div>Loading...</div>}>
@@ -45,63 +38,11 @@ const App = ({ labs }) => {
      */
     const labId = labs[labIndex];
 
-    const [anchorEl, setAnchorEl] = React.useState(null);
-
-    const handleMenuClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleSelectLab = (labIdx) => {
-        setLabIndex(labIdx);
-        setAnchorEl(null);
-    };
     useEffect(() => localStorage.setItem(STORAGE_KEY, labIndex), [labIndex]);
 
     return (
         <ThemeProvider theme={theme}>
-            <AppBar position="sticky">
-                <Toolbar>
-                    {/* ハンバーガーメニューのアイコン */}
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="menu"
-                        onClick={handleMenuClick}
-                        sx={{ mr: 2 }} // メニューアイコンの右にマージンを追加
-                    >
-                        <MenuIcon />
-                    </IconButton>
-
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        React MUI Lab
-                    </Typography>
-
-                    {/* メニュー */}
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={Boolean(anchorEl)}
-                        onClose={handleMenuClose}
-                        anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "left",
-                        }}
-                    >
-                        {labs.map((lab, idx) => (
-                            <MenuItem
-                                key={idx}
-                                onClick={() => handleSelectLab(idx)}
-                            >
-                                {lab}
-                            </MenuItem>
-                        ))}
-                    </Menu>
-                </Toolbar>
-            </AppBar>
-
+            <AppNavbar labs={labs} setLabIndex={setLabIndex} />
             <Container maxWidth="lg" sx={{ paddingTop: 2, paddingBottom: 2 }}>
                 <DynamicLoader labId={labId} />
             </Container>
